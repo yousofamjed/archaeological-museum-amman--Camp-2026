@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Quote, Star } from "lucide-react";
 
 import { useWalkthrough } from "@/components/walkthrough-provider";
-import { PRAISE, REVIEWS, REVIEW_SOURCE } from "@/content/reviews";
+import { HEADLINE, REVIEWS, REVIEW_SOURCE } from "@/content/reviews";
 
 export function ReviewsSection() {
   const { goTo } = useWalkthrough();
@@ -18,19 +18,19 @@ export function ReviewsSection() {
           آراء الزوار كانت نقطة البداية
         </p>
         <p className="mt-4 max-w-2xl text-sand/70">
-          We started from what visitors actually wrote. The objects were never the problem; the way the museum presents
-          them was. Every part of this prototype answers one of these reviews.
+          We started from the complaints visitors actually wrote. The objects are valuable; the way they are kept and
+          shown lets them down. Every part of this prototype answers one of these reviews.
         </p>
 
         <motion.blockquote
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          className="mt-10 rounded-2xl border border-gold/30 bg-gold/[0.06] p-6 md:p-8"
+          className="mt-10 rounded-2xl border border-rose-400/30 bg-rose-500/[0.06] p-6 md:p-8"
         >
-          <Quote className="size-6 text-gold" aria-hidden />
-          <p className="mt-3 font-display text-2xl leading-snug text-sand md:text-3xl">&ldquo;{PRAISE.quote}&rdquo;</p>
-          <ReviewMeta reviewer={PRAISE.reviewer} rating={PRAISE.rating} date={PRAISE.date} />
+          <Quote className="size-6 text-rose-300" aria-hidden />
+          <p className="mt-3 font-display text-2xl leading-snug text-sand md:text-3xl">&ldquo;{HEADLINE.quote}&rdquo;</p>
+          <ReviewMeta reviewer={HEADLINE.reviewer} date={HEADLINE.date} />
         </motion.blockquote>
 
         <ol className="mt-6 space-y-4">
@@ -82,14 +82,16 @@ export function ReviewsSection() {
   );
 }
 
-function ReviewMeta({ reviewer, rating, date }: { reviewer: string; rating: number; date: string }) {
+function ReviewMeta({ reviewer, rating, date }: { reviewer: string; rating?: number; date: string }) {
   return (
     <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-sand/55">
-      <span className="flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
-        {Array.from({ length: 5 }, (_, i) => (
-          <Star key={i} className={i < rating ? "size-3.5 fill-gold text-gold" : "size-3.5 text-sand/25"} aria-hidden />
-        ))}
-      </span>
+      {rating !== undefined && (
+        <span className="flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
+          {Array.from({ length: 5 }, (_, i) => (
+            <Star key={i} className={i < rating ? "size-3.5 fill-gold text-gold" : "size-3.5 text-sand/25"} aria-hidden />
+          ))}
+        </span>
+      )}
       <span>{reviewer}</span>
       <span>·</span>
       <span>{date}</span>

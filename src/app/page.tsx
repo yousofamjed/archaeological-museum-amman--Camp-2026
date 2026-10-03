@@ -1,6 +1,7 @@
 import { ArrivalScene } from "@/components/arrival-scene";
 import { EntranceScene } from "@/components/entrance-scene";
 import { GiftShopSection } from "@/components/gift-shop-section";
+import { GrandOpeningSection } from "@/components/grand-opening-section";
 import { Landing, LandingIntro } from "@/components/landing";
 import { MiniMap } from "@/components/mini-map";
 import { ReviewsSection } from "@/components/reviews-section";
@@ -52,6 +53,7 @@ export default function Home() {
           <RoomSection key={room.id} room={room} />
         ))}
         <GiftShopSection />
+        <GrandOpeningSection />
       </main>
       <SiteFooter />
       <MiniMap />

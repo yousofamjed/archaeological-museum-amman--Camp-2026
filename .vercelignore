@@ -1,0 +1,8 @@
+# Not needed to build the site; the site uses its own copies in src/assets and public/music.
+/resources
+/music
+*.pages
+
+# Build output and dependencies are rebuilt on Vercel.
+/node_modules
+/.next

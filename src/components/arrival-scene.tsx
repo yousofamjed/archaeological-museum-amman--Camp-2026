@@ -26,14 +26,16 @@ export function ArrivalScene() {
   return (
     <section ref={ref} data-stop="arrival" className="relative h-[200svh]" aria-label="Arrival from the Citadel">
       <div className="sticky top-0 h-svh overflow-hidden bg-ink">
-        <Image
-          src={exteriorProposed}
-          alt="Concept render of the museum entrance at dusk, with lighting, planting and a ramp beside the front steps"
-          fill
-          placeholder="blur"
-          sizes="100vw"
-          className="object-cover"
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={exteriorProposed}
+            alt="Concept render of the museum entrance at dusk, with lighting, planting and a ramp beside the front steps"
+            fill
+            placeholder="blur"
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
         <motion.div className="absolute inset-0" style={{ clipPath: beforeClip }}>
           <Image
             src={exteriorToday}

@@ -573,6 +573,7 @@ export type StopId =
   | "front-steps"
   | "stairs"
   | "gift-shop"
+  | "opening"
   | (typeof ROOMS)[number]["id"];
 
 export type Stop = {
@@ -602,4 +603,5 @@ export const STOPS: Stop[] = [
   { id: "stairs", floor: 0, label: "Stairs down", at: [1.7, 8.8] },
   ...ROOMS.slice(3).map((r) => ({ id: r.id, floor: r.floor, label: r.title, at: roomCentre(r.id) })),
   { id: "gift-shop", floor: 1, label: "Gift shop", at: [1.7, 13.6] },
+  { id: "opening", floor: null, label: "Grand opening" },
 ];
