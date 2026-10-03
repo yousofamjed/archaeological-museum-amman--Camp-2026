@@ -10,27 +10,27 @@ const FLOOR_1 = FLOORS[0];
 
 const BEATS = [
   {
-    kicker: "Arrival",
-    title: "You come in from the Citadel",
-    titleAr: "تدخل من جبل القلعة",
-    body: "The 1951 building is left exactly as it is outside. Only the inside changes.",
+    kicker: "Reception",
+    title: "Tickets and a map of the route",
+    titleAr: "التذاكر وخريطة المسار",
+    body: "The door opens onto reception. From the desk, one red route leads through all six rooms.",
   },
   {
-    kicker: "Reception",
-    title: "Tickets, lockers and a map of the route",
-    titleAr: "التذاكر والخزائن وخريطة المسار",
-    body: "A curved desk faces the door. From here, one red route leads through all six rooms.",
+    kicker: "Gift shop",
+    title: "A small shop beside the door",
+    titleAr: "متجر صغير قرب المدخل",
+    body: "To the left, about 16 m² of replicas, books and local crafts. Visitors pass it again on the way out.",
   },
   {
     kicker: "Central hall",
     title: "The hall connects every room",
     titleAr: "البهو يربط القاعات",
-    body: "Benches, a floor mosaic and a timeline wall. Toilets, an accessible WC and the stairs sit along the west wall.",
+    body: "Benches, a floor mosaic and a timeline wall. Toilets, an accessible WC, storage and the stairs sit along the west wall.",
   },
 ];
 
 // Entrance → reception → hall → door of room 1
-const PATH: Point[] = [[3.6, 16.6], [3.6, 13.6], [5.0, 10.2], [7.5, 7.0]];
+const PATH: Point[] = [[5.0, 16.6], [5.0, 13.6], [5.6, 11.0], [7.5, 7.4]];
 
 function pointAlong(points: Point[], t: number): Point {
   const lengths = points.slice(1).map((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]));
@@ -60,7 +60,7 @@ export function EntranceScene() {
   });
 
   return (
-    <section ref={ref} data-stop="entrance" className="relative h-[260svh]" aria-label="Entrance">
+    <section ref={ref} data-stop="entrance" className="relative h-[200svh]" aria-label="Entrance">
       <div className="sticky top-0 grid h-svh items-center gap-6 overflow-hidden px-4 pt-20 md:grid-cols-[1fr_1.2fr] md:px-12">
         <div className="relative z-10 min-h-56">
           {BEATS.map((b, i) => (
@@ -85,8 +85,8 @@ export function EntranceScene() {
         </div>
 
         <div className="relative aspect-square w-full max-w-[min(80svh,640px)] justify-self-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
-          <motion.div className="h-full w-full p-3" style={{ scale: zoom, transformOrigin: "25% 85%" }}>
-            <FloorPlan floor={FLOOR_1} routeProgress={route} you={you} activeId={beat === 2 ? "hall-1" : null} />
+          <motion.div className="h-full w-full p-3" style={{ scale: zoom, transformOrigin: "35% 85%" }}>
+            <FloorPlan floor={FLOOR_1} routeProgress={route} you={you} activeId={beat === 1 ? "gift-shop" : beat === 2 ? "hall-1" : null} />
           </motion.div>
         </div>
       </div>

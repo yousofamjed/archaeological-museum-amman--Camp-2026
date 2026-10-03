@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
+  useMotionTemplate,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -12,15 +13,24 @@ import {
 } from "framer-motion";
 import { X } from "lucide-react";
 
+import { PhotoCredit } from "@/components/photo-credit";
 import { useWalkthrough } from "@/components/walkthrough-provider";
 import type { Hotspot, Room } from "@/content/museum";
 import { cn } from "@/lib/utils";
 
 const HOTSPOT_STYLE: Record<Hotspot["kind"], { dot: string; label: string }> = {
-  object: { dot: "bg-gold", label: "Object" },
-  experience: { dot: "bg-sky-300", label: "Experience" },
+  screen: { dot: "bg-sky-300", label: "Screen" },
+  hologram: { dot: "bg-violet-300", label: "Hologram" },
   note: { dot: "bg-amber-500", label: "Design note" },
 };
+
+// Scroll timeline for one room, as fractions of the section's scroll:
+//   0.00–0.08  today's photo, with the room title
+//   0.08–0.30  the photo wipes away to reveal the proposed room
+//   (the text panel sits under the photo, so the wipe reveals it)
+//   0.40–0.75  screen and hologram pins appear one by one
+const WIPE = [0.08, 0.3];
+const PINS = [0.4, 0.75];
 
 export function RoomSection({ room }: { room: Room }) {
   const ref = useRef<HTMLElement>(null);
@@ -28,30 +38,39 @@ export function RoomSection({ room }: { room: Room }) {
   const { showNotes } = useWalkthrough();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
-  const scale = useTransform(scrollYProgress, [0, 0.25], reduceMotion ? [1, 1] : [1.18, 1]);
-  const shade = useTransform(scrollYProgress, [0, 0.18, 0.88, 1], [0.78, 0.12, 0.12, 0.65]);
-  const introOpacity = useTransform(scrollYProgress, [0, 0.1, 0.2], [1, 1, 0]);
-  const introY = useTransform(scrollYProgress, [0, 0.2], reduceMotion ? [0, 0] : [0, -40]);
-  const panelOpacity = useTransform(scrollYProgress, [0.16, 0.28], [0, 1]);
-  const panelX = useTransform(scrollYProgress, [0.16, 0.28], reduceMotion ? [0, 0] : [-30, 0]);
+  const wipe = useTransform(scrollYProgress, WIPE, [0, 100]);
+  const beforeClip = useMotionTemplate`inset(0 0 0 ${wipe}%)`;
+  const edgeLeft = useMotionTemplate`${wipe}%`;
+  const edgeOpacity = useTransform(scrollYProgress, [WIPE[0], WIPE[0] + 0.02, WIPE[1] - 0.02, WIPE[1]], [0, 1, 1, 0]);
+  const todayOpacity = useTransform(scrollYProgress, [0, WIPE[1] - 0.04, WIPE[1]], [1, 1, 0]);
+
+  const scale = useTransform(scrollYProgress, [WIPE[0], 0.35], reduceMotion ? [1, 1] : [1.04, 1]);
+  const shade = useTransform(scrollYProgress, [0, 0.3, 0.9, 1], [0.45, 0.12, 0.12, 0.6]);
+  const introOpacity = useTransform(scrollYProgress, [0, 0.2, 0.3], [1, 1, 0]);
+  const introY = useTransform(scrollYProgress, [0.2, 0.3], reduceMotion ? [0, 0] : [0, -30]);
+  // The panel is revealed by the wipe itself, so the render's own baked-in text never shows.
+  const panelOpacity = useTransform(scrollYProgress, [0.06, 0.1], [0, 1]);
+  const panelX = useTransform(scrollYProgress, [0.06, 0.1], reduceMotion ? [0, 0] : [-30, 0]);
+  // On phones the text is a bottom sheet over the image, so it waits until the intro title has gone.
+  const sheetOpacity = useTransform(scrollYProgress, [0.3, 0.4], [0, 1]);
 
   const hotspots = room.hotspots.filter((h) => showNotes || h.kind !== "note");
   const [revealed, setRevealed] = useState(0);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  // Hotspots appear one at a time between 30% and 80% of the room's scroll.
   useMotionValueEvent(scrollYProgress, "change", (p) => {
-    const step = 0.5 / Math.max(hotspots.length, 1);
-    const count = p < 0.3 ? 0 : Math.min(hotspots.length, Math.floor((p - 0.3) / step) + 1);
+    const step = (PINS[1] - PINS[0]) / Math.max(hotspots.length, 1);
+    const count = p < PINS[0] ? 0 : Math.min(hotspots.length, Math.floor((p - PINS[0]) / step) + 1);
     setRevealed(count);
-    if (p < 0.25 || p > 0.97) setOpenId(null);
+    if (p < PINS[0] || p > 0.97) setOpenId(null);
   });
 
   const ratio = room.image.width / room.image.height;
 
   return (
-    <section ref={ref} data-stop={room.id} id={room.id} className="relative h-[320svh]" aria-label={room.title}>
+    <section ref={ref} data-stop={room.id} id={room.id} className="relative h-[220svh]" aria-label={room.title}>
       <div className="sticky top-0 h-svh overflow-hidden bg-ink">
+        {/* Proposed room */}
         <motion.div className="absolute inset-0" style={{ scale }}>
           <div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 [container-type:inline-size]"
@@ -85,6 +104,23 @@ export function RoomSection({ room }: { room: Room }) {
           </div>
         </motion.div>
 
+        {/* Today: the current galleries, wiped away left to right */}
+        <motion.div className="absolute inset-0" style={{ clipPath: beforeClip }}>
+          <Image
+            src={room.before.image}
+            alt={room.before.alt}
+            fill
+            placeholder="blur"
+            sizes="100vw"
+            className="object-cover"
+          />
+        </motion.div>
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-sand shadow-[0_0_24px_4px_rgba(239,228,210,0.5)]"
+          style={{ left: edgeLeft, opacity: edgeOpacity }}
+        />
+
         <motion.div className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: shade }} />
 
         <motion.div
@@ -97,27 +133,45 @@ export function RoomSection({ room }: { room: Room }) {
           >
             {room.number}
           </span>
-          <p className="text-xs tracking-[0.3em] text-sand/70 uppercase">Floor {room.floor} · Room {room.number}</p>
-          <h2 className="mt-2 font-display text-5xl text-sand md:text-7xl">{room.title}</h2>
-          <p className="mt-2 font-ar text-3xl text-sand/85 md:text-4xl" lang="ar" dir="rtl">
+          <p className="text-xs tracking-[0.3em] text-sand/80 uppercase">Floor {room.floor} · Room {room.number}</p>
+          <h2 className="mt-2 font-display text-5xl text-sand drop-shadow-lg md:text-7xl">{room.title}</h2>
+          <p className="mt-2 font-ar text-3xl text-sand/90 drop-shadow-lg md:text-4xl" lang="ar" dir="rtl">
             {room.titleAr}
           </p>
-          <p className="mt-4 text-sm tracking-widest" style={{ color: room.accent }}>
+          <p className="mt-4 text-sm tracking-widest drop-shadow" style={{ color: room.accent }}>
             {room.period}
           </p>
         </motion.div>
 
+        <motion.div style={{ opacity: todayOpacity }} className="absolute top-24 right-4 md:right-8">
+          <ThenNowTag label="Today" sublabel={room.before.caption} />
+        </motion.div>
+        <motion.div style={{ opacity: todayOpacity }} className="absolute bottom-4 left-4 md:left-8">
+          <PhotoCredit credit={room.before.credit} />
+        </motion.div>
+
         {/* Phones: the image is cropped to its centre, so text sits in a bottom sheet. */}
         <motion.div
-          style={{ opacity: panelOpacity }}
+          style={{ opacity: sheetOpacity }}
           className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent px-5 pt-16 pb-8 md:hidden"
         >
           <RoomText room={room} showNotes={showNotes} compact />
         </motion.div>
 
-        <HotspotLegend showNotes={showNotes} />
+        <motion.div style={{ opacity: sheetOpacity }}>
+          <HotspotLegend showNotes={showNotes} hasNotes={room.hotspots.some((h) => h.kind === "note")} />
+        </motion.div>
       </div>
     </section>
+  );
+}
+
+export function ThenNowTag({ label, sublabel }: { label: string; sublabel?: string }) {
+  return (
+    <div className="rounded-full border border-white/20 bg-black/60 px-4 py-1.5 text-right backdrop-blur-md">
+      <span className="text-[11px] tracking-[0.25em] text-sand uppercase">{label}</span>
+      {sublabel && <span className="ml-2 text-xs text-sand/70">{sublabel}</span>}
+    </div>
   );
 }
 
@@ -232,8 +286,8 @@ function HotspotPin({ hotspot, open, onToggle }: { hotspot: Hotspot; open: boole
   );
 }
 
-function HotspotLegend({ showNotes }: { showNotes: boolean }) {
-  const kinds = (Object.keys(HOTSPOT_STYLE) as Hotspot["kind"][]).filter((k) => showNotes || k !== "note");
+function HotspotLegend({ showNotes, hasNotes }: { showNotes: boolean; hasNotes: boolean }) {
+  const kinds = (Object.keys(HOTSPOT_STYLE) as Hotspot["kind"][]).filter((k) => k !== "note" || (showNotes && hasNotes));
   return (
     <ul className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 gap-4 rounded-full bg-black/50 px-4 py-1.5 text-[11px] text-sand/70 backdrop-blur md:flex">
       {kinds.map((k) => (

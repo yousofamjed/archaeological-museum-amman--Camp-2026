@@ -8,14 +8,22 @@ type WalkthroughState = {
   activeStop: StopId;
   showNotes: boolean;
   setShowNotes: (value: boolean) => void;
+  /** On by default; browsers still hold audio back until the first click or tap. */
+  soundOn: boolean;
+  setSoundOn: (value: boolean) => void;
+  /** True once a click or tap has let the browser play audio. */
+  audioUnlocked: boolean;
+  setAudioUnlocked: (value: boolean) => void;
   goTo: (stop: StopId) => void;
 };
 
 const WalkthroughContext = createContext<WalkthroughState | null>(null);
 
 export function WalkthroughProvider({ children }: { children: React.ReactNode }) {
-  const [activeStop, setActiveStop] = useState<StopId>("landing");
+  const [activeStop, setActiveStop] = useState<StopId>("intro");
   const [showNotes, setShowNotes] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
 
   // A stop becomes active when its section crosses the middle of the viewport.
   useEffect(() => {
@@ -37,8 +45,8 @@ export function WalkthroughProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const value = useMemo(
-    () => ({ activeStop, showNotes, setShowNotes, goTo }),
-    [activeStop, showNotes, goTo],
+    () => ({ activeStop, showNotes, setShowNotes, soundOn, setSoundOn, audioUnlocked, setAudioUnlocked, goTo }),
+    [activeStop, showNotes, soundOn, audioUnlocked, goTo],
   );
 
   return <WalkthroughContext.Provider value={value}>{children}</WalkthroughContext.Provider>;

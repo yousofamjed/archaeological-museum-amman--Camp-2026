@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import { motion, type MotionValue } from "framer-motion";
+import { ShoppingBag } from "lucide-react";
 
 import {
   FLOOR_SIZE,
@@ -23,6 +24,7 @@ const ZONE_FILL: Record<Zone["kind"], string> = {
   stairs: "#1d1a17",
   reception: "#33291f",
   hub: "#33291f",
+  shop: "#3b2c1c",
 };
 
 const pts = (points: Point[]) => points.map(([x, y]) => `${x},${y}`).join(" ");
@@ -76,6 +78,8 @@ export function FloorPlan({
       {floor.zones.map((zone) => {
         const room = ROOMS.find((r) => r.id === zone.id);
         const isRoom = zone.kind === "room" && room;
+        const isShop = zone.kind === "shop";
+        const clickable = Boolean((isRoom || isShop) && onSelect);
         const isActive = activeId === zone.id;
         const isHover = hoverId === zone.id;
         const [cx, cy] = zone.labelAt ?? polygonCentroid(zone.polygon);
@@ -84,23 +88,23 @@ export function FloorPlan({
         return (
           <g
             key={zone.id}
-            className={cn(isRoom && onSelect && "cursor-pointer")}
-            onClick={isRoom && onSelect ? () => onSelect(zone.id) : undefined}
-            onMouseEnter={isRoom && onHover ? () => onHover(zone.id) : undefined}
-            onMouseLeave={isRoom && onHover ? () => onHover(null) : undefined}
+            className={cn(clickable && "cursor-pointer")}
+            onClick={clickable ? () => onSelect?.(zone.id) : undefined}
+            onMouseEnter={(isRoom || isShop) && onHover ? () => onHover(zone.id) : undefined}
+            onMouseLeave={(isRoom || isShop) && onHover ? () => onHover(null) : undefined}
             onKeyDown={
-              isRoom && onSelect
+              clickable
                 ? (e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      onSelect(zone.id);
+                      onSelect?.(zone.id);
                     }
                   }
                 : undefined
             }
-            tabIndex={isRoom && onSelect ? 0 : undefined}
-            role={isRoom && onSelect ? "button" : undefined}
-            aria-label={isRoom && room ? `Room ${room.number}: ${room.title}` : undefined}
+            tabIndex={clickable ? 0 : undefined}
+            role={clickable ? "button" : undefined}
+            aria-label={isRoom && room ? `Room ${room.number}: ${room.title}` : isShop && clickable ? "Go to the gift shop" : undefined}
           >
             <polygon
               points={pts(zone.polygon)}
@@ -109,7 +113,7 @@ export function FloorPlan({
               strokeWidth={zone.kind === "room" ? 0.14 : 0.06}
             />
             {zone.kind === "stairs" && (
-              <rect x={0.4} y={8.3} width={2.6} height={3.4} fill={`url(#${stairsPattern})`} />
+              <rect x={0.4} y={7.1} width={2.6} height={3.4} fill={`url(#${stairsPattern})`} />
             )}
             {isRoom && room && (
               <polygon
@@ -120,7 +124,42 @@ export function FloorPlan({
               />
             )}
 
-            {isRoom && room ? (
+            {isShop && (
+              <polygon
+                points={pts(zone.polygon)}
+                fill="#c9a46a"
+                className="transition-opacity duration-300"
+                opacity={isActive ? 0.55 : isHover ? 0.4 : 0.16}
+              />
+            )}
+
+            {isShop ? (
+              // Drawn like the rooms: a badge (a bag instead of a number), names and area.
+              <g pointerEvents="none">
+                <circle cx={cx} cy={cy - (compact ? 0 : 0.6)} r={compact ? 0.9 : 0.55} fill="#c9a46a" />
+                <ShoppingBag
+                  x={cx - (compact ? 0.55 : 0.32)}
+                  y={cy - (compact ? 0.55 : 0.92)}
+                  width={compact ? 1.1 : 0.64}
+                  height={compact ? 1.1 : 0.64}
+                  color="#17110c"
+                  strokeWidth={2.4}
+                />
+                {!compact && (
+                  <>
+                    <text x={cx} y={cy + 0.5} textAnchor="middle" fontSize={0.46} fill="#f1e6d4" className="font-ar">
+                      {zone.labelAr}
+                    </text>
+                    <text x={cx} y={cy + 1.12} textAnchor="middle" fontSize={0.4} fill="#d8c7ad">
+                      {zone.label}
+                    </text>
+                    <text x={cx} y={cy + 1.7} textAnchor="middle" fontSize={0.34} fill="#a8957b">
+                      ≈ {area.toFixed(0)} m²
+                    </text>
+                  </>
+                )}
+              </g>
+            ) : isRoom && room ? (
               <g pointerEvents="none">
                 <circle cx={cx} cy={cy - (compact ? 0 : 1.1)} r={compact ? 0.9 : 0.62} fill={room.accent} />
                 <text
@@ -163,7 +202,7 @@ export function FloorPlan({
                   y={cy}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize={zone.kind === "hall" || zone.kind === "reception" || zone.kind === "hub" ? 0.42 : 0.32}
+                  fontSize={zone.kind === "hall" || zone.kind === "reception" || zone.kind === "hub" || zone.kind === "shop" ? 0.42 : 0.32}
                   fill="#a8957b"
                   pointerEvents="none"
                 >
@@ -201,7 +240,7 @@ export function FloorPlan({
       ))}
 
       {floor.id === 1 && !compact && (
-        <path d="M0.9 14.9 Q 3.6 13.2 6.0 14.6" fill="none" stroke="#c9a46a" strokeWidth={0.22} strokeLinecap="round" />
+        <path d="M3.9 13.4 Q 4.6 14.2 3.9 15.1" fill="none" stroke="#c9a46a" strokeWidth={0.22} strokeLinecap="round" />
       )}
 
       {/* Visitor route */}

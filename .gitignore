@@ -37,3 +37,6 @@ next-env.d.ts
 
 # camp material (not for public repo)
 *.pages
+
+# raw music uploads (trimmed copies live in public/music)
+/music/
