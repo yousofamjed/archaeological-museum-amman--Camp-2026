@@ -40,3 +40,4 @@ next-env.d.ts
 
 # raw music uploads (trimmed copies live in public/music)
 /music/
+.env*
