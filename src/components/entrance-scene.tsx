@@ -11,9 +11,9 @@ const FLOOR_1 = FLOORS[0];
 const BEATS = [
   {
     kicker: "Reception",
-    title: "Tickets and a map of the route",
-    titleAr: "التذاكر وخريطة المسار",
-    body: "The door opens onto reception. From the desk, one red route leads through all six rooms.",
+    title: "A welcome and a map of the route",
+    titleAr: "ترحيب وخريطة المسار",
+    body: "Entry is already covered by the Citadel ticket bought at the gate, so there is no ticket desk. Reception welcomes visitors and points them to one red route through all six rooms.",
   },
   {
     kicker: "Gift shop",

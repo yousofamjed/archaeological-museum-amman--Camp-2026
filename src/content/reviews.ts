@@ -44,8 +44,8 @@ export const REVIEWS: Review[] = [
     date: "Jan 2020",
     problem: "Neglected objects, missing and badly translated labels",
     answer:
-      "Every object gets a new case and a caption written properly in Arabic and English, checked by the Department of Antiquities, and the screens carry the longer story.",
-    answerAr: "كل قطعة تحصل على خزانة عرض جديدة ونص مكتوب بعناية بالعربية والإنجليزية، تراجعه دائرة الآثار، والشاشات تروي الحكاية كاملة.",
+      "Every object gets a new case and a caption written properly in Arabic and English, checked by the Department of Antiquities. A QR code beside it opens the full story in any language with an audio version, and a braille label sits on the case.",
+    answerAr: "كل قطعة تحصل على خزانة عرض جديدة ونص مكتوب بعناية بالعربية والإنجليزية تراجعه دائرة الآثار، ورمز QR بجانبها يفتح الحكاية كاملة بأي لغة مع نسخة صوتية، وبطاقة بلغة برايل على الخزانة.",
     link: { label: "Step into the Stone Age", stop: "stone-age" },
   },
   {
@@ -60,19 +60,6 @@ export const REVIEWS: Review[] = [
       "Each era becomes its own room, with its own light, sound and atmosphere, and screens and life-size holograms built around the real objects.",
     answerAr: "كل حقبة تصبح قاعة خاصة بها، بإضاءتها وصوتها وأجوائها، مع شاشات وصور ثلاثية الأبعاد حول القطع الأصلية.",
     link: { label: "See the Iron Age room", stop: "iron-persian" },
-  },
-  {
-    id: "scrolls",
-    quote:
-      "we were a little disappointed when the Dead Sea scrolls were not present. It was one of our sole reasons for going.",
-    reviewer: "Samilynn J",
-    rating: 3,
-    date: "Dec 2022",
-    problem: "Visitors come for something that isn't there",
-    answer:
-      "Every room has a clear star object, starting with the 'Ain Ghazal statues, so the visit is built around what is here, not what has left.",
-    answerAr: "لكل قاعة قطعة رئيسية واضحة، بدءاً بتماثيل عين غزال، فتُبنى الزيارة حول ما هو موجود فعلاً.",
-    link: { label: "Meet the 'Ain Ghazal statues", stop: "stone-age" },
   },
   {
     id: "few-things",
@@ -95,8 +82,8 @@ export const REVIEWS: Review[] = [
     date: "Oct 2023",
     problem: "Nothing to stay for, English-only labels",
     answer:
-      "Reasons to stay: music for each era, touch screens to explore, a Story Hub for events, and every text in Arabic as well as English.",
-    answerAr: "أسباب للبقاء: موسيقى لكل حقبة، وشاشات تفاعلية، ومساحة للحكايات والفعاليات، وكل النصوص بالعربية والإنجليزية.",
+      "Reasons to stay: music for each era, touch screens to explore and a Story Hub for events. Labels are no longer English-only: every object has Arabic and English text, a QR code for any language with audio, and braille.",
+    answerAr: "أسباب للبقاء: موسيقى لكل حقبة، وشاشات تفاعلية، ومساحة للحكايات والفعاليات. ولم تعد النصوص بالإنجليزية فقط: لكل قطعة نص بالعربية والإنجليزية، ورمز QR لأي لغة مع الصوت، وبطاقة برايل.",
     link: { label: "See the Byzantine room", stop: "byzantine" },
   },
 ];
