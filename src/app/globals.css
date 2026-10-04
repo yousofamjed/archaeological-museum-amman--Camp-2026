@@ -3,6 +3,8 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* Touch-first devices (phones, tablets); keep in sync with src/lib/device.ts. */
+@custom-variant touch (@media (hover: none) and (pointer: coarse));
 
 @theme inline {
   --color-background: var(--background);

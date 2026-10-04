@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import type { StopId } from "@/content/museum";
+import { TOUCH_DEVICE_QUERY } from "@/lib/device";
 
 type WalkthroughState = {
   activeStop: StopId;
@@ -22,7 +23,18 @@ const WalkthroughContext = createContext<WalkthroughState | null>(null);
 export function WalkthroughProvider({ children }: { children: React.ReactNode }) {
   const [activeStop, setActiveStop] = useState<StopId>("intro");
   const [showNotes, setShowNotes] = useState(false);
-  const [soundOn, setSoundOn] = useState(true);
+  const [soundPreference, setSoundOn] = useState(true);
+  // Phones and tablets get no sound at all; see src/lib/device.ts.
+  const [touchDevice, setTouchDevice] = useState(false);
+  const soundOn = soundPreference && !touchDevice;
+
+  useEffect(() => {
+    const query = window.matchMedia(TOUCH_DEVICE_QUERY);
+    const update = () => setTouchDevice(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
 
   // A stop becomes active when its section crosses the middle of the viewport.

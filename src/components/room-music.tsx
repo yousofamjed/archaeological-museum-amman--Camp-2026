@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 import { useWalkthrough } from "@/components/walkthrough-provider";
 import { ROOMS } from "@/content/museum";
+import { soundAllowed } from "@/lib/device";
 import { unlockFootsteps } from "@/lib/footsteps";
 
 const VOLUME = 0.6;
@@ -54,6 +55,7 @@ function silenceOthers() {
  * started muted and paused again straight away, except the current one.
  */
 export function unlockRoomMusic() {
+  if (!soundAllowed()) return;
   unlockFootsteps();
   for (const room of ROOMS) {
     if (!room.music) continue;

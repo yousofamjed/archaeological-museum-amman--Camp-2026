@@ -141,7 +141,9 @@ export function Landing() {
             }}
             className="group flex flex-col items-center gap-2 text-sm text-sand/80 hover:text-sand"
           >
-            Begin the walk from the Citadel, with sound
+            <span>
+              Begin the walk from the Citadel<span className="touch:hidden">, with sound</span>
+            </span>
             <ArrowDown className="size-5 animate-bounce text-gold" />
           </button>
         </div>

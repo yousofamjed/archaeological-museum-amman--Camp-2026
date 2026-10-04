@@ -28,7 +28,7 @@ export function SiteHeader() {
             aria-pressed={soundOn}
             aria-label={soundOn ? "Turn music off" : "Turn music on"}
             className={cn(
-              "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors",
+              "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors touch:hidden",
               soundOn ? "border-gold/60 bg-gold/15 text-sand" : "border-white/15 text-sand/70 hover:text-sand",
             )}
           >
